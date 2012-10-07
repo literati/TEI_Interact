@@ -8,23 +8,26 @@
 class TeiInteract_ConfigController extends Omeka_Controller_Action {
 
     /**
-     * User has requested to browse the available TEI files on the system.
+     * User has requested to browse the available 
+     * TEI files on the system.
      * Get them and pass them to the view.
+     * Also, generate a list of related items for each
      */
     public function browseAction() {
         $results = array();
         $db = $this->getDb();
         $teiStuff = $db->getTable('TeiInteractCleanup')->findBySQL('omeka_table_name != ?', array('Item'));
+
+
         foreach($teiStuff as $ts){
             
                 $next = $db->getTable($ts->omeka_table_name)->find($ts->omeka_table_id);
-//                $results[] = $next;
-                    if (!in_array($ts->omeka_table_name, $results)) {
+                
+                if (!in_array($ts->omeka_table_name, $results)) {
                     $results[] = array($ts->omeka_table_name => array($next));
                 } else {
                     $results[$ts->omeka_table_name][] = $next;
                 }
-            
         }
         
         $this->view->results = $results;

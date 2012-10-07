@@ -41,6 +41,7 @@ head(array('title' => 'TEI Interact Tags', 'textclass' => 'primary', 'content_cl
                     
                     $tags = $record['tags'];
 //                    sort($tags, SORT_STRING);
+                    $options = null;
                     $title = item('Dublin Core', 'Title', $options, $file->getItem());
                     $xml = $file->getWebPath('archive');
                     echo "<em>".$file->original_filename."</em> attached to <strong>" . $title . "</strong><br/><a href=\"" . $xml . "\">" . $xml . "</a>";

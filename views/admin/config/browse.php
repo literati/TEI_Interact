@@ -11,7 +11,7 @@ head(array('title' => 'TEI Interact Configuration', 'bodyclass' => 'primary', 'c
 <div id="primary">
     <?php echo flash(); ?>
     <?php
-    print_r($el);
+
     if (!empty($err)) {
         echo '<p class="error">' . html_escape($err) . '</p>';
     }
@@ -20,7 +20,7 @@ head(array('title' => 'TEI Interact Configuration', 'bodyclass' => 'primary', 'c
     $cells = array();
     foreach($files as $file){
         
-        $title = item('Dublin Core', 'Title', $options, $file->getItem());
+        $title = item('Dublin Core', 'Title', $options=null, $file->getItem());
 
         $line1 = sprintf("<strong>%s</strong> - %s",$title ,$file->original_filename);
         $line2 = sprintf("<br/><a href=\"%s\">Raw</a>&nbsp;&nbsp;", $file->getWebPath('archive'));
@@ -60,12 +60,11 @@ head(array('title' => 'TEI Interact Configuration', 'bodyclass' => 'primary', 'c
 
     
     echo "<hr/>";
-    $max = max(count($cells), count($iCells));
-    
+    $min = min(count($cells), count($iCells));
     //build table
     $table = "<table>";
     $table.="<tr><th>FILES</th><th>INFRASTRUCTURE</th></tr>";
-    for($i=0;$i<$max;$i++){
+    for($i=0;$i<$min;$i++){
         $row = "<tr>";
         $row.="<td>$cells[$i]</td><td>$iCells[$i]</td>";
         $row.="</tr>";
