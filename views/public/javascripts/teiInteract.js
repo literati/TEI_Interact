@@ -19,7 +19,7 @@ $(document).ready(function(){
 function enter(tag, type){
             console.log("begin the enter callback");
                 var $hover = encodeURIComponent($(this).text());
-            $("#thing").load("http://apc.local/tei-interact/services/lookup?hover="
+            $("#thing").load("http://apc.new/tei-interact/services/lookup?hover="
                 +$hover
                 +"&element="
                 +tag

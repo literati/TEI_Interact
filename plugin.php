@@ -14,7 +14,6 @@
 use \Omeka_Record;
 require_once('controllers/ConfigController.php');
 /**
- * 
  * This class is the main script for the plugin as desribed in 
  * @link http://omeka.org/codex/Plugin_Writing_Best_Practices The Omeka Plugins-writing best practices
  */
@@ -22,11 +21,19 @@ class TeiInteract extends Omeka_Plugin_Abstract {
 
 /**
  * hooks array
- * The hooks that you declare you are using in the $_hooks array must have a corresponding public method of the form hook{Hookname} as above. 
+ * The hooks that you declare you are using in the $_hooks array 
+ * must have a corresponding public method of the form hook{Hookname} as above. 
  * @link http://omeka.org/codex/Plugin_Writing_Best_Practices Plugins Best-practices
  * @var string[] the set of hooks that this plugin uses
  */
-protected $_hooks = array('install', 'initialize', 'public_theme_header', 'public_theme_body', 'uninstall', 'define_acl');
+    protected $_hooks = array(
+        'install', 
+        'initialize', 
+        'public_theme_header', 
+        'public_theme_body', 
+        'uninstall', 
+        'define_acl'
+    );
 
 /**
  *
@@ -47,19 +54,19 @@ protected $_filters = array('admin_navigation_main');
  * this does nothing
  */
 public function hookInitialize() {
-//        debug('TeiInteract::hookInitialize()');
+    debug('TeiInteract::hookInitialize()');
     
     $tbl = new ItemTypeTable('ItemType', get_db());
     $itemType = $tbl->findByName('TEI Interact Item');
     /**
      * used when inserting items    
      */
-    define(TEI_INTERACT_ITEM_TYPE, $itemType->id);
+    define('TEI_INTERACT_ITEM_TYPE', $itemType->id);
     
     
     $tbl = new ElementTable('Element', get_db());
-    define(TEI_ELEMENT_ID, $tbl->findByElementSetNameAndElementName(TEI_ELEMENT_SET, TEI_ELEMENT));
-    define(TEI_TAG_ID, $tbl->findByElementSetNameAndElementName(TEI_ELEMENT_SET, TEI_TAG));
+    define('TEI_ELEMENT_ID', $tbl->findByElementSetNameAndElementName(TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_ELEMENT));
+    define('TEI_TAG_ID', $tbl->findByElementSetNameAndElementName(TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_TAG));
     
     if (!defined('TEI_INTERACT_PLUGIN_DIR')) {
     define('TEI_INTERACT_PLUGIN_DIR', dirname(__FILE__));
