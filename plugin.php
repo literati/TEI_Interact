@@ -61,7 +61,7 @@ public function hookInitialize() {
     /**
      * used when inserting items    
      */
-    define('TEI_INTERACT_ITEM_TYPE', $itemType->id);
+    //define('TEI_INTERACT_ITEM_TYPE', $itemType->id);
     
     
     $tbl = new ElementTable('Element', get_db());
