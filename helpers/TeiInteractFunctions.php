@@ -16,9 +16,12 @@
         
         $tbl = get_db()->getTable('ElementText');
         $matches = $tbl->findBySQL("`element_id` = 50 AND `text` = ?", array($title));
-        debug(sprintf("found %d matches in element texts table for title '%s'", count($matches), $title));
-        debug(sprintf("match id = %d", $matches[0]->id));
-        
+
+        if(count($matches)>0){
+            debug(sprintf("found %d matches in element texts table for title '%s'", count($matches), $title));
+            debug(sprintf("match id = %d", $matches[0]->id));
+        }
+
         $items = array();
         foreach($matches as $match){
             $items[] = get_db()->getTable('Item')->find($match->record_id);

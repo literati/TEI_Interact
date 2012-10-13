@@ -35,7 +35,8 @@ class TeiInteract_TripleSet {
         
         $tripleSet->rootItems = teiInteract_getItemsByDCTitle($title); //step 1
         
-        debug(sprintf("%s - found %d matches for search term '%s'; first found match ID = %d", get_class(), count($tripleSet->rootItems), $title, $tripleSet->rootItems[0]->id));
+        if(count($tripleSet->rootItems)>0){
+            debug(sprintf("%s - found %d matches for search term '%s'; first found match ID = %d", get_class(), count($tripleSet->rootItems), $title, $tripleSet->rootItems[0]->id));
         $tripleSet->triples = array();
         debug(sprintf("%s - processing %d item records into one triple Set", get_class(), count($tripleSet->rootItems)));
         
@@ -87,6 +88,7 @@ class TeiInteract_TripleSet {
                         count($tripleSet->triples)
                         )
                     );
+        }
             return $tripleSet;
         } 
     

@@ -15,7 +15,7 @@ $thing = "<div class=\"thing-content\">";
     
     
     
-    if ($tripleSet) {
+    if (count($tripleSet->triples)>0) {
         $buffer.="<ul>";
         foreach ($tripleSet->triples as $itemID => $triples) {
             foreach($triples as $triple){
