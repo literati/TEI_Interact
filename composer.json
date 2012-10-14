@@ -1,3 +1,4 @@
 {
-    "name": "literati/TeiInteract"
+    "name": "literati/TeiInteract",
+    "type": "omeka-plugin"
 }
