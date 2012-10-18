@@ -50,7 +50,7 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
         $section = $this->_getParam('section');
 
 
-        $this->view->file_id = $file_id;
+        $this->view->file_id = $this->file_id;
 
 
 
@@ -62,6 +62,7 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
         $domSection = $xml->getElementsByTagName($section);
         $tagElements = $domSection->item(0)->getElementsByTagName($tag);
 
+        
         if ($tag == 'name') {
             $xml = new SimpleXMLElement(file_get_contents($path));
             $nameObjs = $this->_parseNames($xml);
