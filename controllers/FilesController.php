@@ -5,7 +5,7 @@ require_once("ConfigController.php");
  * @package TeiInteract
  *
  */
-class TeiInteract_FilesController extends Omeka_Controller_Action {
+class TeiInteract_FilesController extends Omeka_Controller_Action implements tei_parlance{
 
     /**
      *
@@ -41,25 +41,24 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
     public function tagAction() {
 
         //get the File from the db
-        $db = get_db();
-        $this->file_id = $this->_getParam('id');
-        $file = $db->getTable('File')->find($this->file_id);
-
-        $tag = $this->_getParam('tag');
-        $section = $this->_getParam('section');
-
+        $db             = get_db();
+        $this->file_id  = $this->_getParam('id');
+        $file           = $db->getTable('File')->find($this->file_id);
+        $tag            = $this->_getParam('tag');
+        $section        = $this->_getParam('section');
 
         $this->view->file_id = $this->file_id;
 
+        $tags           = array();
+        $xml            = new DOMDocument();
+        $path           = BASE_DIR . DIRECTORY_SEPARATOR . 'archive' . DIRECTORY_SEPARATOR . $file->getStoragePath('archive');
 
-
-        $tags = array();
-        $xml = new DOMDocument();
-        $path = BASE_DIR . DIRECTORY_SEPARATOR . 'archive' . DIRECTORY_SEPARATOR . $file->getStoragePath('archive');
         _log('loading xml from ' . $path);
         $xml->loadXML(file_get_contents($path));
-        $domSection = $xml->getElementsByTagName($section);
-        $tagElements = $domSection->item(0)->getElementsByTagName($tag);
+        
+        $domSection     = $xml->getElementsByTagName($section);
+        $tagElements    = $domSection->item(0)->getElementsByTagName($tag);
+        $nameObjs       = null;
 
         
         if ($tag == 'name') {
@@ -270,7 +269,7 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
         switch ($xml->getName()) {
             
             case 'persName':
-                $itemType = $tbl->findByName(TeiInteract::CHARACTER_TYPE);
+                $itemType = $tbl->findByName(CHARACTER_TYPE);
                 
                 $relations[] = $this->_buildRelationTriple(
                     array($file->item_id,'Story has Character',null)
@@ -281,7 +280,7 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
                 break;
 
             case 'geogName':
-                $itemType = $tbl->findByName(TeiInteract::PLACE_TYPE);
+                $itemType = $tbl->findByName(PLACE_TYPE);
                 
                 $relations[] = $this->_buildRelationTriple(
                     array($file->item_id,'Has Setting',null)
@@ -300,15 +299,15 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
                 foreach ($xml[0]->attributes() as $key => $val) {
                     if ($key == 'type') {
                         if ($val == 'ship') {
-                            $itemType = $tbl->findByName(TeiInteract::SHIP_TYPE);
+                            $itemType = $tbl->findByName(SHIP_TYPE);
                         }
                     }
                 }
-//                $itemTypeId = $tbl->findByName(TeiInteract::CHARACTER_TYPE);
+//                $itemTypeId = $tbl->findByName(CHARACTER_TYPE);
                 break;
             
             case 'publisher':
-                $itemType = $tbl->findByName(TeiInteract::PUBLISHER_TYPE);
+                $itemType = $tbl->findByName(PUBLISHER_TYPE);
                 
                 $relations[] = $this->_buildRelationTriple(
                     array(null,'Published',$file->item_id)
