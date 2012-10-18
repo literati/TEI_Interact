@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Main front-most controller for the TeiInteract plugin
+ * Main front-most controller 
+ * for the TeiInteract plugin
  * @package TeiInteract
  * 
  */
@@ -16,18 +17,22 @@ class TeiInteract_ConfigController extends Omeka_Controller_Action {
     public function browseAction() {
         $results = array();
         $db = $this->getDb();
-        $teiStuff = $db->getTable('TeiInteractCleanup')->findBySQL('omeka_table_name != ?', array('Item'));
+        
+        
+        $teiStuff = $db->getTable('TeiInteractCleanup')
+                       ->findBySQL('omeka_table_name != ?', array('Item'));
 
 
         foreach($teiStuff as $ts){
             
-                $next = $db->getTable($ts->omeka_table_name)->find($ts->omeka_table_id);
-                
-                if (!in_array($ts->omeka_table_name, $results)) {
-                    $results[] = array($ts->omeka_table_name => array($next));
-                } else {
-                    $results[$ts->omeka_table_name][] = $next;
-                }
+            $next = $db->getTable($ts->omeka_table_name)->find($ts->omeka_table_id);
+            
+            if (!in_array($ts->omeka_table_name, $results)) {
+                $results[] = array($ts->omeka_table_name => array($next));
+            } 
+            else {
+                $results[$ts->omeka_table_name][] = $next;
+            }
         }
         
         $this->view->results = $results;
@@ -38,28 +43,18 @@ class TeiInteract_ConfigController extends Omeka_Controller_Action {
         }        
     }
 
-//    public function deleteAction() {
-//        $itemType->delete();
-//        $elSet->delete();
-//    }
-
-
-
-
-
-
 
     public static function saveCleanupData($omeka_table_name, $omeka_table_id){
-                        //store id for later cleanup 
-                $cln = new TeiInteractCleanup();
-                $cln->omeka_table_id = $omeka_table_id;
-                $cln->omeka_table_name = $omeka_table_name;
-                $cln->save();
-                _log("storing cleanup data");
+        //store id for later cleanup 
+        $cln = new TeiInteractCleanup();
+        $cln->omeka_table_id = $omeka_table_id;
+        $cln->omeka_table_name = $omeka_table_name;
+        $cln->save();
+        _log("storing cleanup data");
     }
     
 
-        /**
+    /**
      * Get TEI files from the files table by mime type.
      * @return File|boolean
      */
