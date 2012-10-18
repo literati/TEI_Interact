@@ -1,30 +1,32 @@
 <?php
 
 /**
- * TEI Interact is a plugin to provide hooks into the TEI markup of a document.
+ * TEI Interact is a plugin to provide 
+ * hooks into the TEI markup of a document.
  * 
- * We intend to extend the functionality provided by the Scholar's Lab TeiDisplay plugin
+ * We intend to extend the functionality 
+ * provided by the Scholar's Lab TeiDisplay plugin
  * @package TeiInteract 
- */
-/**
- * a dummy test CONSTANT
  */
 
 
 use \Omeka_Record;
 require_once('controllers/ConfigController.php');
 /**
- * This class is the main script for the plugin as desribed in 
- * @link http://omeka.org/codex/Plugin_Writing_Best_Practices The Omeka Plugins-writing best practices
+ * This class is the main script for 
+ * the plugin as desribed in 
+ * @link http://omeka.org/codex/Plugin_Writing_Best_Practices 
+ * The Omeka Plugins-writing best practices
  */
 class TeiInteract extends Omeka_Plugin_Abstract {
 
 /**
- * hooks array
- * The hooks that you declare you are using in the $_hooks array 
- * must have a corresponding public method of the form hook{Hookname} as above. 
+ * The hooks that you declare you are 
+ * using in the $_hooks array 
+ * must have a corresponding public 
+ * method of the form hook{Hookname} as above. 
  * @link http://omeka.org/codex/Plugin_Writing_Best_Practices Plugins Best-practices
- * @var string[] the set of hooks that this plugin uses
+ * @var string[] $_hooks the set of hooks that this plugin uses
  */
     protected $_hooks = array(
         'install', 
@@ -35,117 +37,111 @@ class TeiInteract extends Omeka_Plugin_Abstract {
         'define_acl'
     );
 
-/**
- *
- * @var string[] the aset of filters we are implementing
- */
-protected $_filters = array('admin_navigation_main');
-
-    const PUBLISHER_TYPE = 'Publisher';
-    const PLACE_TYPE = 'Place';
-    const CHARACTER_TYPE = 'Character';
-    const SHIP_TYPE = 'Ship';
-    
-    const TEI_ELEMENT_SET = 'TEI Interact';
-    const TEI_ELEMENT = 'TEI_ELEMENT';
-    const TEI_TAG = 'TEI_TAG';
-
-/**
- * this does nothing
- */
-public function hookInitialize() {
-    debug('TeiInteract::hookInitialize()');
-    
-    $tbl = new ItemTypeTable('ItemType', get_db());
-    $itemType = $tbl->findByName('TEI Interact Item');
     /**
-     * used when inserting items    
+     *
+     * @var string[] the aset of filters we are implementing
      */
-    //define('TEI_INTERACT_ITEM_TYPE', $itemType->id);
+    protected $_filters = array('admin_navigation_main');
+
+    const PUBLISHER_TYPE    = 'Publisher';
+    const PLACE_TYPE        = 'Place';
+    const CHARACTER_TYPE    = 'Character';
+    const SHIP_TYPE         = 'Ship';
     
-    
-    $tbl = new ElementTable('Element', get_db());
-    define('TEI_ELEMENT_ID', $tbl->findByElementSetNameAndElementName(TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_ELEMENT));
-    define('TEI_TAG_ID', $tbl->findByElementSetNameAndElementName(TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_TAG));
-    
-    if (!defined('TEI_INTERACT_PLUGIN_DIR')) {
-    define('TEI_INTERACT_PLUGIN_DIR', dirname(__FILE__));
-    
-    
+    const TEI_ELEMENT_SET   = 'TEI Interact';
+    const TEI_ELEMENT       = 'TEI_ELEMENT';
+    const TEI_TAG           = 'TEI_TAG';
+
+    public function hookInitialize() {
+        debug('TeiInteract::hookInitialize()');
+        
+        $tbl = new ItemTypeTable('ItemType', get_db());
+        $itemType = $tbl->findByName('TEI Interact Item');
+        /**
+         * used when inserting items    
+         */
+        //define('TEI_INTERACT_ITEM_TYPE', $itemType->id);
+        
+        
+        $tbl = new ElementTable('Element', get_db());
+        define('TEI_ELEMENT_ID', 
+            $tbl->findByElementSetNameAndElementName(
+                TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_ELEMENT));
+        define('TEI_TAG_ID', 
+            $tbl->findByElementSetNameAndElementName(
+                TeiInteract::TEI_ELEMENT_SET, TeiInteract::TEI_TAG));
+        
+        if (!defined('TEI_INTERACT_PLUGIN_DIR')) {
+        define('TEI_INTERACT_PLUGIN_DIR', dirname(__FILE__));
+        
+        
+        }
+        require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteractFunctions.php';
+        require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteract_Triple.php';
+        require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteract_TripleSet.php';
+        debug(sprintf("my plugin dir = %s",TEI_INTERACT_PLUGIN_DIR));
     }
-    require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteractFunctions.php';
-    require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteract_Triple.php';
-    require_once TEI_INTERACT_PLUGIN_DIR.'/helpers/TeiInteract_TripleSet.php';
-    debug(sprintf("my plugin dir = %s",TEI_INTERACT_PLUGIN_DIR));
-}
 
-/**
- * inject some javascript and (maybe soon) somem of Derick's CSS and the THING itself
- * @param type $request 
- */
-public function hookPublicThemeHeader($request) {
+    /**
+     * @param type $request 
+     */
+    public function hookPublicThemeHeader($request) {
+        echo js('teiInteract');
+    }
 
+    /**
+     * Insert something into the theme body
+     * @param type $request 
+     */
+    public function hookPublicThemeBody($request) {
 
-echo js('teiInteract');
-}
+    }
 
-/**
- * Insert something into the theme body
- * @param type $request 
- */
-public function hookPublicThemeBody($request) {
+    /**
+     * Do things when the user clicks install, 
+     * like build DB tables, etc
+     * @throws Exception
+     */
+    function hookInstall() {
+        $db = get_db();
+        if (!class_exists('XSLTProcessor')) {
+            throw new Exception('Unable to access XSLTProcessor class.  Make sure the php-xsl package is installed.');
+        } else {
 
-}
-
-/**
- * Do things when the user clicks install, like build DB tables, etc
- * @throws Exception
- */
-function hookInstall() {
-$db = get_db();
-if (!class_exists('XSLTProcessor')) {
-throw new Exception('Unable to access XSLTProcessor class.  Make sure the php-xsl package is installed.');
-} else {
-//            if(!copy('libraries/teiInteract_default.xsl', TEI_DISPLAY_STYLESHEET_FOLDER, null)){
-//                throw new Exception('Failed to copy libraries/teiInteract_default.xsl');
-//            }
-//            if(!copy('libraries/teiInteract_component.xsl', TEI_DISPLAY_STYLESHEET_FOLDER.DIRECTORY_SEPARATOR."includes", null)){
-//                throw new Exception('Failed to copy libraries/teiInteract_component.xsl');
-//            }
-debug("done trying to copy files to xsl directory" . TEI_DISPLAY_STYLESHEET_FOLDER);
-//create for facet mapping
-$db->exec("DROP TABLE IF EXISTS `{$db->prefix}tei_interact_configs`; ");
-$db->exec("
-           CREATE TABLE IF NOT EXISTS `{$db->prefix}tei_interact_configs` (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `tag_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-            `create_item` set('ana','key','type','value') COLLATE utf8_unicode_ci DEFAULT NULL,
-            `create_tag` set('ana','key','type','value') COLLATE utf8_unicode_ci DEFAULT NULL,
-            PRIMARY KEY (`id`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-        ");
-$db->exec("
-            INSERT INTO `{$db->prefix}tei_interact_configs` (`id`, `tag_name`, `create_item`) VALUES
-            (1, 'name', 'type,value'),
-            (2, 'geogName', 'type,value'),
-            (5, 'persName', 'value'),
-            (3, 'interp', 'ana,type,value'),
-            (6, 'persName', 'ana,key,type,value'),
-            (7, 'orgName', 'ana,key,type,value');
-           ");
-            
-$db->exec("
-        DROP TABLE IF EXISTS `{$db->prefix}tei_interact_cleanups`;    
-        ");
-            
-$db->exec(
-        "CREATE TABLE IF NOT EXISTS `{$db->prefix}tei_interact_cleanups` (
-          `id` int(11) NOT NULL AUTO_INCREMENT,
-          `omeka_table_name` varchar(80) NOT NULL,
-          `omeka_table_id` int(11) NOT NULL,
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
-        );
+    debug("done trying to copy files to xsl directory" . TEI_DISPLAY_STYLESHEET_FOLDER);
+    //create for facet mapping
+    $db->exec("DROP TABLE IF EXISTS `{$db->prefix}tei_interact_configs`; ");
+    $db->exec("
+               CREATE TABLE IF NOT EXISTS `{$db->prefix}tei_interact_configs` (
+                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `tag_name` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+                `create_item` set('ana','key','type','value') COLLATE utf8_unicode_ci DEFAULT NULL,
+                `create_tag` set('ana','key','type','value') COLLATE utf8_unicode_ci DEFAULT NULL,
+                PRIMARY KEY (`id`)
+                ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+            ");
+    $db->exec("
+                INSERT INTO `{$db->prefix}tei_interact_configs` (`id`, `tag_name`, `create_item`) VALUES
+                (1, 'name', 'type,value'),
+                (2, 'geogName', 'type,value'),
+                (5, 'persName', 'value'),
+                (3, 'interp', 'ana,type,value'),
+                (6, 'persName', 'ana,key,type,value'),
+                (7, 'orgName', 'ana,key,type,value');
+               ");
+                
+    $db->exec("
+            DROP TABLE IF EXISTS `{$db->prefix}tei_interact_cleanups`;    
+            ");
+                
+    $db->exec(
+            "CREATE TABLE IF NOT EXISTS `{$db->prefix}tei_interact_cleanups` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `omeka_table_name` varchar(80) NOT NULL,
+              `omeka_table_id` int(11) NOT NULL,
+              PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;"
+            );
 
 
 
@@ -163,7 +159,7 @@ $db->exec(
             
             
             if (function_exists('fedora_connector_installed')) {
-//do something similar
+            //do something similar
 
             }
         }
@@ -360,8 +356,11 @@ $db->exec(
     /**
      * 
      * This hook runs when Omeka's ACL is instantiated. 
-     * It allows plugin writers to manipulate the ACL that controls user access in Omeka.
-     * In general, plugins use this hook to restrict and/or allow access for specific user roles to the pages that it creates. 
+     * It allows plugin writers to manipulate the ACL 
+     * that controls user access in Omeka.
+     * In general, plugins use this hook to restrict 
+     * and/or allow access for specific user roles 
+     * to the pages that it creates. 
      * @param Zend_Acl $acl The ACL object (a subclass of Zend_Acl)
      */
     function hookDefineAcl($acl) {
@@ -370,24 +369,27 @@ $db->exec(
     
     private function _saveVocabularies(){
             // Install the formal vocabularies and their properties.
-        $formalVocabularies = include 'formal_vocabularies.php';
-        foreach ($formalVocabularies as $formalVocabulary) {
-            $vocabulary = new ItemRelationsVocabulary;
-            $vocabulary->name = $formalVocabulary['name'];
-            $vocabulary->description = $formalVocabulary['description'];
-            $vocabulary->namespace_prefix = $formalVocabulary['namespace_prefix'];
-            $vocabulary->namespace_uri = $formalVocabulary['namespace_uri'];
-            $vocabulary->custom = 0;
-            $vocabulary->save();
+        $fmlVocabs = include 'formal_vocabularies.php';
+        foreach ($fmlVocabs as $fmlVocab) {
+            
+            $Vocab                     = new ItemRelationsVocab;
+            
+            $Vocab->name               = $fmlVocab['name'];
+            $Vocab->description        = $fmlVocab['description'];
+            $Vocab->namespace_prefix   = $fmlVocab['namespace_prefix'];
+            $Vocab->namespace_uri      = $fmlVocab['namespace_uri'];
+            $Vocab->custom             = 0;
+
+            $Vocab->save();
             TeiInteract_ConfigController::saveCleanupData('ItemRelationsVocabulary', 
-                                                                $vocabulary->id);
+                                                                $Vocab->id);
             
-//            $vocabularyId = $db->lastInsertId();
-            $vocabularyId = $vocabulary->id;
+//            $VocabId = $db->lastInsertId();
+            $VocabId = $Vocab->id;
             
-            foreach ($formalVocabulary['properties'] as $formalProperty) {
+            foreach ($fmlVocab['properties'] as $formalProperty) {
                 $property = new ItemRelationsProperty;
-                $property->vocabulary_id = $vocabularyId;
+                $property->Vocab_id = $VocabId;
                 $property->local_part = $formalProperty['local_part'];
                 $property->label = $formalProperty['label'];
                 $property->description = $formalProperty['description'];
