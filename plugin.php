@@ -104,9 +104,13 @@ class TeiInteract extends Omeka_Plugin_Abstract {
      */
     function hookInstall() {
         $db = get_db();
+        
         if (!class_exists('XSLTProcessor')) {
-            throw new Exception('Unable to access XSLTProcessor class.  Make sure the php-xsl package is installed.');
-        } else {
+            throw new Exception(
+                'Unable to access XSLTProcessor class.  
+                Make sure the php-xsl package is installed.');
+        } 
+        else {
 
     debug("done trying to copy files to xsl directory" . TEI_DISPLAY_STYLESHEET_FOLDER);
     //create for facet mapping
@@ -122,12 +126,12 @@ class TeiInteract extends Omeka_Plugin_Abstract {
             ");
     $db->exec("
                 INSERT INTO `{$db->prefix}tei_interact_configs` (`id`, `tag_name`, `create_item`) VALUES
-                (1, 'name', 'type,value'),
+                (1, 'name',     'type,value'),
                 (2, 'geogName', 'type,value'),
                 (5, 'persName', 'value'),
-                (3, 'interp', 'ana,type,value'),
+                (3, 'interp',   'ana,type,value'),
                 (6, 'persName', 'ana,key,type,value'),
-                (7, 'orgName', 'ana,key,type,value');
+                (7, 'orgName',  'ana,key,type,value');
                ");
                 
     $db->exec("
@@ -240,22 +244,16 @@ class TeiInteract extends Omeka_Plugin_Abstract {
         );
         
         foreach($itemTypes as $itemType){
-        $itemType = insert_item_type(
-                                array(
-                                    'name' => $itemType['name'],
-                                    'description' => $itemType['description']
-                                      )
-                                );
+            $itemType = 
+                insert_item_type(
+                    array(
+                        'name'          => $itemType['name'],
+                        'description'   => $itemType['description']
+                          )
+                    );
         TeiInteract_ConfigController::saveCleanupData('ItemType', $itemType->id);
         }
-
-
-   
-    
-    
-    
-   
-}
+    }
 
     private function _createElementSets() {
 
@@ -280,8 +278,6 @@ class TeiInteract extends Omeka_Plugin_Abstract {
             }
         }
         
-        
-        
         $message = $alreadyCreated == 4 ? " already exists in the DB!" : " created in the DB";
         debug($result." Element set '" . $es . "', with ID ". $elSet->id . $message, $alreadyCreated);
         
@@ -293,21 +289,21 @@ class TeiInteract extends Omeka_Plugin_Abstract {
         $elSet= get_db()->getTable('ElementSet')->find($elSetId);
         $elTbl = new ElementTable('Element', get_db());
         $elements = array(
-                        array(
-                            "name" => 'TEI Tag',
-                            "description" => 'TEI tags for identifying items as related to a certain TEI-tagged value',
-                            "record_type_id" => 2,
-                            "data_type_id" => 1,
-                            "element_set_id" => $elSet->id
-                            ),
-                        array(
-                            "name" => 'TEI Element',
-                            "description" => "name of the source TEI-XML element ('name', 'persName', 'interp', etc)",
-                            "record_type_id" => 2,
-                            "data_type_id" => 1,
-                            "element_set_id" => $elSet->id
-                            )
-                        );
+            array(
+                "name"              => 'TEI Tag',
+                "description"       => 'TEI tags for identifying items as related to a certain TEI-tagged value',
+                "record_type_id"    => 2,
+                "data_type_id"      => 1,
+                "element_set_id"    => $elSet->id
+                ),
+            array(
+                "name"              => 'TEI Element',
+                "description"       => "name of the source TEI-XML element ('name', 'persName', 'interp', etc)",
+                "record_type_id"    => 2,
+                "data_type_id"      => 1,
+                "element_set_id"    => $elSet->id
+                )
+            );
         foreach($elements as $element) {
             $el = null;
             if (($el = $elTbl->findByElementSetNameAndElementName(
@@ -315,9 +311,9 @@ class TeiInteract extends Omeka_Plugin_Abstract {
                 $el = new Element();
                 _log("creating new element");
                 $el->record_type_id = $element["record_type_id"];
-                $el->data_type_id = $element["data_type_id"];
-                $el->name = $element["name"];
-                $el->description = $element["description"];
+                $el->data_type_id   = $element["data_type_id"];
+                $el->name           = $element["name"];
+                $el->description    = $element["description"];
                 $el->element_set_id = $element["element_set_id"];
                 $el->save();
 
@@ -364,7 +360,8 @@ class TeiInteract extends Omeka_Plugin_Abstract {
      * @param Zend_Acl $acl The ACL object (a subclass of Zend_Acl)
      */
     function hookDefineAcl($acl) {
-        $acl->loadResourceList(array('TeiInteract_Config' => array('browse', 'status')));
+        $acl->loadResourceList(
+            array('TeiInteract_Config' => array('browse', 'status')));
     }
     
     private function _saveVocabularies(){
@@ -381,10 +378,9 @@ class TeiInteract extends Omeka_Plugin_Abstract {
             $Vocab->custom             = 0;
 
             $Vocab->save();
-            TeiInteract_ConfigController::saveCleanupData('ItemRelationsVocabulary', 
-                                                                $Vocab->id);
+            TeiInteract_ConfigController::saveCleanupData(
+                'ItemRelationsVocabulary', $Vocab->id);
             
-//            $VocabId = $db->lastInsertId();
             $VocabId = $Vocab->id;
             
             foreach ($fmlVocab['properties'] as $formalProperty) {
@@ -395,8 +391,8 @@ class TeiInteract extends Omeka_Plugin_Abstract {
                 $property->description = $formalProperty['description'];
                 $property->save();
                 
-                TeiInteract_ConfigController::saveCleanupData('ItemRelationsProperty', 
-                                                                $property->id);
+                TeiInteract_ConfigController::saveCleanupData(
+                    'ItemRelationsProperty', $property->id);
             }
         }
     }
