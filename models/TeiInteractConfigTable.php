@@ -13,11 +13,11 @@ class TeiInteractConfigTable extends Omeka_Db_Table {
     }
 
     /**
-     * Apply a set of filters to a Select object based on the parameters 
-     * given.
+     * Apply a set of filters to a Select 
+     * object based on the parameters given.
      * 
-     * This template method must be implemented by subclasses in order to define
-     * search behaviors.
+     * This template method must be implemented 
+     * by subclasses in order to define search behaviors.
      * 
      * @param Omeka_Db_Select $select
      * @param array $params

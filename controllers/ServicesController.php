@@ -1,6 +1,7 @@
 <?php
 /**
- * This class encapsulates functionality for responding to AJAX-type requests from the user
+ * This class encapsulates functionality for 
+ * responding to AJAX-type requests from the user
  * @package TeiInteract 
  * 
  */
