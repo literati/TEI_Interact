@@ -8,6 +8,17 @@
  * provided by the Scholar's Lab TeiDisplay plugin
  * @package TeiInteract 
  */
+interface tei_parlance{
+    const PUBLISHER_TYPE    = 'Publisher';
+    const PLACE_TYPE        = 'Place';
+    const CHARACTER_TYPE    = 'Character';
+    const SHIP_TYPE         = 'Ship';
+    
+    const TEI_ELEMENT_SET   = 'TEI Interact';
+    const TEI_ELEMENT       = 'TEI_ELEMENT';
+    const TEI_TAG           = 'TEI_TAG';
+
+}
 
 
 use \Omeka_Record;
@@ -18,7 +29,7 @@ require_once('controllers/ConfigController.php');
  * @link http://omeka.org/codex/Plugin_Writing_Best_Practices 
  * The Omeka Plugins-writing best practices
  */
-class TeiInteract extends Omeka_Plugin_Abstract {
+class TeiInteract extends Omeka_Plugin_Abstract implements tei_parlance {
 
 /**
  * The hooks that you declare you are 
@@ -43,14 +54,6 @@ class TeiInteract extends Omeka_Plugin_Abstract {
      */
     protected $_filters = array('admin_navigation_main');
 
-    const PUBLISHER_TYPE    = 'Publisher';
-    const PLACE_TYPE        = 'Place';
-    const CHARACTER_TYPE    = 'Character';
-    const SHIP_TYPE         = 'Ship';
-    
-    const TEI_ELEMENT_SET   = 'TEI Interact';
-    const TEI_ELEMENT       = 'TEI_ELEMENT';
-    const TEI_TAG           = 'TEI_TAG';
 
     public function hookInitialize() {
         debug('TeiInteract::hookInitialize()');
