@@ -1,10 +1,7 @@
-
-
-
 <?php
 require_once("ConfigController.php");
+
 /**
- * Main front-most controller for the TeiInteract plugin
  * @package TeiInteract
  *
  */
@@ -12,7 +9,8 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
 
     /**
      *
-     * @var boolean Whether or not to output debug messages from this class
+     * @var boolean Whether or not to 
+     * output debug messages from this class
      */
     private $debug = true;
 
@@ -23,7 +21,8 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
     public $file_id;
 
     /**
-     * User has requested to browse the available TEI files on the system.
+     * User has requested to browse the 
+     * available TEI files on the system.
      * Get them and pass them to the view.
      */
     public function browseAction() {
@@ -68,9 +67,9 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
             $nameObjs = $this->_parseNames($xml);
         }
 
-        $this->view->tag = $tag;
-        $this->view->tags = $tagElements;
-        $this->view->types = $nameObjs;
+        $this->view->tag    = $tag;
+        $this->view->tags   = $tagElements;
+        $this->view->types  = $nameObjs;
     }
 
     /**
@@ -84,19 +83,20 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
 
         $db = get_db();
 
-        $id = $this->_getParam('id');
-        $file = $db->getTable('File')->find($id);
+        $id     = $this->_getParam('id');
+        $file   = $db->getTable('File')->find($id);
         $this->view->id = $id;
 
         $table = $db->getTable('TeiInteractName');
         $this->view->dbCount = $table->fileRecordsExist($id);
 
-        $tags = array();
-        $xml = new DOMDocument();
-        $path = BASE_DIR . DIRECTORY_SEPARATOR . 'archive' . DIRECTORY_SEPARATOR . $file->getStoragePath('archive');
+        $tags   = array();
+        $xml    = new DOMDocument();
+        $path   = BASE_DIR . DIRECTORY_SEPARATOR . 'archive' . DIRECTORY_SEPARATOR . $file->getStoragePath('archive');
+
         _log('attempting to load xml from ' . $path);
         $xml->loadXML(file_get_contents($path));
-//            $elements = $xml->getElementsByTagName('*');
+
         $headList = $xml->getElementsByTagName('teiHeader');
         if ($headList->length !== 1) {
             debug("too many teiHeader nodes in the document");
@@ -123,7 +123,6 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
         foreach ($headElements as $element) {
             if (!in_array($element->nodeName, $tags['head'])) {
                 $tags['head'][] = $element->nodeName;
-//                _log("found element " . $element->nodeName);
             }
         }
         foreach ($textElements as $element) {
@@ -144,9 +143,14 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
         $db = get_db();
         $this->file_id = $this->_getParam('id');
         $file = $db->getTable('File')->find($this->file_id);
-        $tagsWeCareAbout = array('//persName', '//geogName', "//name[@type='ship']", "//sourceDesc/bibl/publisher");
-        _log("from harvest action handler, we are going to work with file id = " 
-                . $this->file_id);
+        $tagsWeCareAbout = array(
+                '//persName', 
+                '//geogName', 
+                "//name[@type='ship']", 
+                "//sourceDesc/bibl/publisher");
+
+        _log("from harvest action handler, we are going 
+            to work with file id = ". $this->file_id);
 
 
         $path = BASE_DIR . DIRECTORY_SEPARATOR . 'archive' . DIRECTORY_SEPARATOR 
@@ -177,9 +181,7 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
             }
             debug(sprintf("Found %d instances for xpath %s", count($results), $xpath));
         }
-//        $count = $this->_createNames($this->_parseNames($xml));
-//        $count = $this->_createNames($this->_parseNames($xml));
-//        _log("created " . $count . " records for file " . $this->file_id);
+
         /**
          * @TODO this is a hack; check the docs for a cleaner solution
          * http://framework.zend.com/manual/en/zend.controller.actionhelpers.html
@@ -203,30 +205,23 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
     }
 
     private function _normalizeText($string){
-        debug("begin normalizeText...". $string);
         $pattern = array("/'s/", "/\s\s/", "/\b\./", "/'\b/","/\b'/");
         $replace = array(""," ", '','','');
-        debug(sprintf("cleaning string %s", $string));
-        $new = preg_replace($pattern, $replace, $string);
-        debug(sprintf("returning cleaned string %s", $new));
-        return $new;
+        return preg_replace($pattern, $replace, $string);
     }
     
     private function _checkExists($itemTypeId, $title){
-        debug("calling normalize text... for title ".$title);
-        $title = $this->_normalizeText($title);
-        $tbl = new ElementTable('Element', $this->getDb());
-        $dcTitleElement = $tbl->findByElementSetNameAndElementName('Dublin Core', 'Title');
+        $title  = $this->_normalizeText($title);
+        $tbl    = new ElementTable('Element', $this->getDb());
+        $dcTitle= $tbl->findByElementSetNameAndElementName('Dublin Core', 'Title');
         
-        $etTbl = new ElementTextTable('ElementText', $this->getDb());
-        $found = $etTbl->findBySQL("element_id = ? AND text = ?", array($dcTitleElement->id, $title));
-        debug(sprintf("looking for an element with id %d and text '%s'", $dcTitleElement->id, $title));
+        $etTbl  = new ElementTextTable('ElementText', $this->getDb());
+        $found  = $etTbl->findBySQL("element_id = ? AND text = ?", array($dcTitle->id, $title));
+        debug(sprintf("looking for an element with id %d and text '%s'", $dcTitle->id, $title));
         if(!empty($found)){
             foreach($found as $f){
-                debug(sprintf('found match for item type id (%d), title (%s) in Element text table id = %d, text = %s',$itemTypeId, $title,$f->id, $f->text));
                 $item = $this->getDb()->getTable('Item')->find($f->record_id);
                 if($item->item_type_id == $itemTypeId){
-                    
                     return true;
                 }
             }
@@ -238,41 +233,39 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
     private function _buildRelationTriple($rel){
         
         $relTbl = new ItemRelationsPropertyTable('ItemRelationsProperty', $this->getDb());
-        $tbl = $this->getDb()->getTable('ItemRelationsProperty');
-        
-        $prop = $tbl->findBySql('label = ?', array($rel[1]));
-        
-        $r = new ItemRelationsItemRelation();
+        $tbl    = $this->getDb()->getTable('ItemRelationsProperty');
+        $prop   = $tbl->findBySql('label = ?', array($rel[1]));
+        $r      = new ItemRelationsItemRelation();
         
         $r->subject_item_id = $rel[0];
-        $r->property_id = $prop[0]->id;;
-        $r->object_item_id = $rel[2];
+        $r->property_id     = $prop[0]->id;;
+        $r->object_item_id  = $rel[2];
 
         return $r;
     }
     
     /**
-     * This method creates relationships for a predefined (hard-coded) set of tags
-     * by first matching it against a number of cases.
-     * Once the relationships are created, we, cleanup the input string (ie the value of the XML),
-     * see if a similarly named item already exists, and if not, we save a new item for the 
+     * This method creates relationships for a 
+     * predefined (hard-coded) set of tags by 
+     * first matching it against a number of cases.
+     * Once the relationships are created, cleanup 
+     * the input string (ie the value of the XML),
+     * see if a similarly named item already exists, 
+     * and if not, we save a new item for the 
      * XML text value
      * 
      * @param SimpleXMLElement $xml
      * @return boolean
      */
     private function _parse(SimpleXMLElement $xml) {
-        $tagname = $xml->getName();
-        if (!$tagname) {
-            debug('FilesController::_parse() - arg \$xml is null, returning false');
+        if (!($tagname = $xml->getName())) {
             return false;
         }
-        $tbl = new ItemTypeTable('ItemType', $this->getDb());
-        $itemType = null;
-        debug('FilesController::_parse() - entering multiway switch ');
-        
-        $file = $this->getDb()->getTable('File')->find($this->getRequest()->getParam('id'));
-        $relations = array();
+
+        $tbl        = new ItemTypeTable('ItemType', $this->getDb());
+        $itemType   = null;
+        $file       = $this->getDb()->getTable('File')->find($this->getRequest()->getParam('id'));
+        $relations  = array();
         
         switch ($xml->getName()) {
             
@@ -312,7 +305,6 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
                     }
                 }
 //                $itemTypeId = $tbl->findByName(TeiInteract::CHARACTER_TYPE);
-                debug('FilesController::_parse() - multiway switch - case = name');
                 break;
             
             case 'publisher':
@@ -328,42 +320,42 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
                 break;
 
             default:
-                debug('FilesController::_parse() - taking default case in mwy switch    ');
                 break;
 
 
         }
-                $title = $this->_normalizeText(trim((string) $xml[0]));
-                
-                //if the item exists, break out of here....
-                if($this->_checkExists($itemType->id, $title)){
-                    return;
-                }
-                
-                $item = insert_item(array(
-                    'public' => false,
-                    'item_type_id' => $itemType->id
-                        ), array(
-                    'Dublin Core' => array(
-                        'Title' => array(
-                            array('text' => $title, 'html' => 'false')
-                        )
-                    ),
-                    'TEI Interact' => array(
-                        'TEI Tag' => array(
-                            array('text' => $title, 'html' => 'false')
-                        ),
-                        'TEI Element' => array(
-                            array('text' => $tagname, 'html' => 'false')
-                        )
-                    )
-                        )
-                );
-                
-                $this->_saveRelations($relations, $item);
 
-                debug('FilesController::_parse() - leaving method       ');
-                TeiInteract_ConfigController::saveCleanupData('Item', $item->id);
+        $title = $this->_normalizeText(trim((string) $xml[0]));
+        
+        //if the item exists, break out of here....
+        if($this->_checkExists($itemType->id, $title)){
+            return;
+        }
+        
+        $item = insert_item(array(
+            'public' => false,
+            'item_type_id' => $itemType->id
+                ), array(
+            'Dublin Core' => array(
+                'Title' => array(
+                    array('text' => $title, 'html' => 'false')
+                )
+            ),
+            'TEI Interact' => array(
+                'TEI Tag' => array(
+                    array('text' => $title, 'html' => 'false')
+                ),
+                'TEI Element' => array(
+                    array('text' => $tagname, 'html' => 'false')
+                )
+            )
+                )
+        );
+        
+        $this->_saveRelations($relations, $item);
+
+        debug('FilesController::_parse() - leaving method       ');
+        TeiInteract_ConfigController::saveCleanupData('Item', $item->id);
 
         return true;
     }
@@ -379,12 +371,8 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
     private function _saveRelations($relations, $item) {
         foreach ($relations as $r) {
             
-//            debug(sprintf("from _save, relation type is %s, obj_id = %d",
-//                gettype($r), 
-//                $r->object_item_id
-//                )
-//            );
             $tbl = new ItemRelationsItemRelationTable('ItemRelationsItemRelation', $this->getDb());
+
             if (is_null($r->object_item_id)) {
                 $r->object_item_id = $item->id;
             } elseif (is_null($r->subject_item_id)) {
@@ -392,7 +380,10 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
             }
 
             $matches = $tbl->findByObjectItemId($r->object_item_id);
-            $flag = false; //set to true if we find that an identical relationship already exists
+            //set $flag to true if we find that an 
+            //identical relationship already exists
+            $flag = false; 
+            
             foreach ($matches as $match) {
                 if ($match->subject_item_id == $r->subject_item_id) {
                     $flag = true; //duplicate found; exit;
@@ -436,14 +427,13 @@ class TeiInteract_FilesController extends Omeka_Controller_Action {
                         debug("record save FAIL!");
                 }
             }else {
-//                        debug('record already exists(id=' . $exists->id . '): not saving duplicate record');
             }
         }
         return $count;
     }
 
     private static function _namesDiffer(TeiInteractName $n1, TeiInteractName $n2) {
-        $mismatch = 0;
+        $mismatch  = 0;
         $mismatch += $type = ($n1->type == $n2->type) ? 0 : 1;
         $mismatch += $teiHeader = ($n1->teiHeader == $n2->teiHeader) ? 0 : 1;
         $mismatch += $value = ($n1->value == $n2->value) ? 0 : 1;
