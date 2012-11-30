@@ -7,10 +7,11 @@
  * @package TeiInteract 
  */
 $buffer = "";
-$thing = "<div class=\"thing-content\">";
+$thing  = "<div class=\"thing-content\">";
 foreach ($occurrences as $file => $fileAttrs) {
-    print_r("$file");
-    $buffer.="<span class=\"thing-result\">File:".$file." - (".$fileAttrs['count'].")</span><br/>";
+    //print_r("$file");
+    $buffer.    ="<span class=\"thing-result\">File:".$file." - (".$fileAttrs['count'].")</span><br/>";
+    
     debug("view got result ".$file);
 }
 
